@@ -1,0 +1,23 @@
+.home-container{
+  background: #130933;
+  .hero-list{
+    .card{
+      color: white;
+      width: 400px;
+      background: #362478;
+      border-radius: 10px;
+      .image{
+        padding: 20px;
+      }
+      .table{
+        border-left: 1px solid white;
+        .table-item{
+          border-right: 1px solid white;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+      }
+    }
+  }
+}

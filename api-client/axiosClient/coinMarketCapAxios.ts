@@ -1,14 +1,16 @@
-import axios from 'axios';
+import axios from "axios";
 
-const axiosClient = axios.create({
-  baseURL: process.env.apiDomain,
+
+const coinMarketCapAxios = axios.create({
+  baseURL: process.env.coinMarketCapDomain,
   headers: {
     'Content-Type': 'application/json',
+    'X-CMC_PRO_API_KEY': 'a51fb980-ddd1-4477-8f20-27286b458052',
+    'Accept': 'application/json'
   },
 });
 
-// Add a response interceptor
-axiosClient.interceptors.response.use(
+coinMarketCapAxios.interceptors.response.use(
   function(response) {
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
@@ -21,4 +23,4 @@ axiosClient.interceptors.response.use(
   },
 );
 
-export default axiosClient;
+export default coinMarketCapAxios;

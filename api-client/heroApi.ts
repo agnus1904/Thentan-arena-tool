@@ -1,4 +1,4 @@
-import axiosClient from "./axios-client";
+import thetanMarketAxios from "./axiosClient/thetanMarketAxios";
 
 export interface filter{
   sort: string,
@@ -10,9 +10,15 @@ export interface filter{
 
 const HeroApi = {
   getAll(filter: filter){
-    console.log(filter);
-    return axiosClient.get(`search?sort=${filter.sort.toString()}&batPercentMin=${filter.batPercentMin.toString()}&heroRarity=${filter.heroRarity.toString()}&from=${filter.from.toString()}&size=20`);
+    return thetanMarketAxios.get(
+      'search' +
+      '?sort='+filter.sort.toString()+
+      '&batPercentMin='+filter.batPercentMin.toString()+
+      '&heroRarity='+filter.heroRarity.toString()+
+      '&from='+filter.from.toString()+'&size=20');
   }
 }
+
+
 
 export default HeroApi;
