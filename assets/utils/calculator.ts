@@ -1,25 +1,21 @@
 import heroConstant from "../constants/hero";
+import {IHero} from "../../models";
 
 
 const calculatorHero = {
   price: (hero: any)=>{
     return hero['systemCurrency'].value/(Math.pow(10,hero['systemCurrency'].decimals));
   },
-  availableBattle: (hero: any) =>{
-    return hero['battleCapMax']-hero['battleCap']
-  },
   totalBattleDay: (hero: any)=>{
-    return (calculatorHero.availableBattle(hero))/heroConstant.DailyBattle[hero['heroRarity']];
+    return (hero['battleCap'])/heroConstant.DailyBattle[hero['heroRarity']];
   },
-  THCReward: (hero: any, percent: number)=>{
-    const index = hero['heroRarity'];
-    const available = calculatorHero.availableBattle(hero)
-    return (heroConstant.Rarity[index]*(available)) * percent / 100;
+  THCReward: (hero: IHero, percent: number)=>{
+    const index = hero.heroRarity;
+    const available = hero.battleCap;
+    const rewardWin = (heroConstant.Rarity[index]*(available)) * percent / 100;
+    const rewardLose = hero['battleCap'] * (100-percent) / 100;
+    return rewardWin + rewardLose;
   }
-}
-
-const calculatePrice = (system: any)=>{
-  return system.value/(Math.pow(10,system.decimals));
 }
 
 export default calculatorHero;

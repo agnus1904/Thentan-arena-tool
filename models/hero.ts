@@ -32,3 +32,11 @@ export interface IHero{
   tokenId: string;
   trophyClass: any;
 }
+
+export interface IHeroFilter{
+  sort: string,
+  batPercentMin: number,
+  heroRarity: number,
+  from: number,
+  size: number
+}

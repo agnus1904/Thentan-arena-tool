@@ -1,5 +1,5 @@
 import React from 'react';
-import {IHero} from "../../../models";
+import {IHero, IPrice} from "../../../models";
 import styles from "../../../styles/pages/home.module.scss";
 import {Button, Card, Col, Image, Row, Typography} from "antd";
 import calculatorHero from "../../../assets/utils/calculator";
@@ -10,10 +10,7 @@ const { Title, Text } = Typography;
 
 interface HeroItemProps {
   hero: IHero,
-  price: {
-    WBNB: number|undefined,
-    THC: number|undefined
-  } | null
+  price: IPrice
 }
 
 const percents =  [30, 40, 50, 60, 70, 80];
@@ -23,13 +20,13 @@ const HeroItem: React.FC<HeroItemProps> = (props)=>{
   const { hero, price } = props
 
   const calculateHeroPrice = React.useCallback(()=>{
-    return calculatorHero.price(hero)*(price?.WBNB|| 0)
-  },[hero, price?.WBNB])
+    return calculatorHero.price(hero)*price.WBNB
+  },[hero, price.WBNB])
 
   const calculateTotalUSD = React.useCallback((_percent: number)=>{
-    const totalUSD = calculatorHero.THCReward(hero, _percent)*(price?.THC||0);
+    const totalUSD = calculatorHero.THCReward(hero, _percent)*price.THC;
     return totalUSD-calculateHeroPrice();
-  },[calculateHeroPrice, hero, price?.THC])
+  },[calculateHeroPrice, hero, price.THC])
 
   const percentRewardComponent = React.useMemo(()=>{
     return (
@@ -78,7 +75,7 @@ const HeroItem: React.FC<HeroItemProps> = (props)=>{
               </Title>
               {rarityComponent}
             </div>
-            <Title level={3} style={{color: '#ff8700'}}>
+            <Title level={3} className={'color-orange'}>
               {calculatorHero.price(hero).toFixed(2)} WBNB
             </Title>
             <Title level={3} style={{marginTop: 0, color: '#09d509'}}>
@@ -96,7 +93,7 @@ const HeroItem: React.FC<HeroItemProps> = (props)=>{
               <Title level={4} >
                 <Row >
                   <Col span={16}>Available</Col>
-                  <Col span={8} className={'color-text'}>{calculatorHero.availableBattle(hero)}</Col>
+                  <Col span={8} className={'color-text'}>{hero.battleCap}</Col>
                 </Row>
                 <Row>
                   <Col span={16}>Total</Col>

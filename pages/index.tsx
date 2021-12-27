@@ -6,35 +6,39 @@ import {Button, Col, Row, Typography} from 'antd';
 import HeroItem from "../components/common/HeroItem";
 import coinApi from "../api-client/coinApi";
 import Head from 'next/head'
+import {IHero, IHeroFilter, IPrice} from "../models";
 
 const { Title } = Typography;
 
 const Home: NextPage = () => {
-  const [heroes, setHeroes] = React.useState([])
+  const [heroes, setHeroes] = React.useState<IHero[]>([])
   const [price, setPrice] =
-    React.useState< null |{WBNB: number|undefined,THC: number|undefined}>(null)
+    React.useState< null | IPrice>(null)
+  const [filter, setFilter] = React.useState<IHeroFilter>({
+    sort: 'Latest',
+    batPercentMin: 0,
+    heroRarity: 0,
+    from: 0,
+    size: 10000
+  })
 
-  const recallHeroes = React.useCallback(() => {
-    heroApi.getAll({
-      sort: 'Latest',
-      batPercentMin: 0,
-      heroRarity: 1,
-      from: 0,
-      size: 10000
-    }).then((res) => {
-      setHeroes(res.data);
-    }).catch((err) => {
-      console.log(err)
-    })
-  }, [])
+  const recallHeroes = React.useCallback(async () => {
+    const response = await heroApi.getAll(filter);
+    if(response.error || !response.data) return;
+    setHeroes(response.data);
+  }, [filter])
+
 
   const getPrice = React.useCallback(async ()=>{
     setHeroes([]);
-    const THCPrice = await coinApi.getPriceThetan();
-    const WBNBPrice = await coinApi.getPriceWBNB();
+    const price = await coinApi.getPrice();
+    if(price.error || !price.data){
+      setPrice(null);
+      return;
+    }
     setPrice({
-      WBNB: WBNBPrice,
-      THC: THCPrice
+      WBNB: price.data.WBNB,
+      THC: price.data.THC
     })
   },[])
 
@@ -52,7 +56,7 @@ const Home: NextPage = () => {
   }
 
   const heroListComponent = React.useMemo(() => (
-    heroes.map((_hero) => filterHero(_hero) ? (
+    price && heroes.map((_hero) => filterHero(_hero) ? (
         <Col key={_hero['refId']} lg={8} md={12} sm={24}
              style={{display: 'flex', justifyContent: 'center', padding: 20}}>
           <HeroItem hero={_hero} price={price}/>
