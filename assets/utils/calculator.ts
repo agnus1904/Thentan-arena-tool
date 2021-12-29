@@ -3,11 +3,11 @@ import {IHero} from "../../models";
 
 
 const calculatorHero = {
-  price: (hero: any)=>{
-    return hero['systemCurrency'].value/(Math.pow(10,hero['systemCurrency'].decimals));
+  price: (hero: IHero)=>{
+    return hero.systemCurrency.value/(Math.pow(10,hero.systemCurrency.decimals));
   },
-  totalBattleDay: (hero: any)=>{
-    return (hero['battleCap'])/heroConstant.DailyBattle[hero['heroRarity']];
+  totalBattleDay: (hero: IHero)=>{
+    return (hero.battleCap)/heroConstant.DailyBattle[hero.heroRarity];
   },
   THCReward: (hero: IHero, percent: number)=>{
     const index = hero.heroRarity;

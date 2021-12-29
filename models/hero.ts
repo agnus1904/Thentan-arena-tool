@@ -36,7 +36,7 @@ export interface IHero{
 export interface IHeroFilter{
   sort: string,
   batPercentMin: number,
-  heroRarity: number,
+  heroRarity: number[],
   from: number,
   size: number
 }

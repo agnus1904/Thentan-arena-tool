@@ -1,13 +1,12 @@
 import thetanMarketAxios from "./axiosClient/thetanMarketAxios";
 import {IHero} from "../models";
-import {IException, IResponse} from "../models/response";
+import {IResponse} from "../models/response";
 import errorTransfer from "../assets/constants/error";
-import {AxiosResponse} from "axios";
 
 export interface filter{
   sort: string,
   batPercentMin: number,
-  heroRarity: number,
+  heroRarity: number[],
   from: number,
   size: number
 }
@@ -19,12 +18,13 @@ const HeroApi = {
         'search' +
         '?sort='+filter.sort.toString()+
         '&batPercentMin='+filter.batPercentMin.toString()+
-        '&heroRarity='+filter.heroRarity.toString()+
-        '&from='+filter.from.toString()+'&size=6');
-        return {
-          error: false,
-          data: response.data
-        };
+        '&heroRarity='+filter.heroRarity.join(',')+
+        '&from='+filter.from.toString()+
+        '&size='+filter.size.toString());
+      return {
+        error: false,
+        data: response.data
+      };
     }catch (err: any){
       return {
         error: true,

@@ -1,4 +1,5 @@
 export interface IPrice{
   WBNB: number,
-  THC: number
+  THC: number,
+  THG: number
 }

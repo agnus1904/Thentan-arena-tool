@@ -1,20 +1,19 @@
-import coinMarketCapAxios from "./axiosClient/coinMarketCapAxios";
 import {IPrice} from "../models";
 import {IResponse} from "../models/response";
 import errorTransfer from "../assets/constants/error";
+import axios from "axios";
 
 
 const coinApi = {
   getPrice: async (): Promise<IResponse<IPrice>> =>{
     try {
-      const response = await coinMarketCapAxios.get(process.env.coinMarketCapEndpoint+'?slug=thetan-coin,wbnb');
-      const WBNBPrice = response.data['7192']['quote']['USD']['price'];
-      const THCPrice = response.data['15250']['quote']['USD']['price'];
+      const response = await axios.get('/api/get-price');
       return {
         error: false,
         data: {
-          WBNB: WBNBPrice,
-          THC: THCPrice
+          WBNB: response.data.WBNB,
+          THC: response.data.THC,
+          THG :response.data.THG
         }
       }
     } catch (err){

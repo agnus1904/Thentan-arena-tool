@@ -1,6 +1,6 @@
 import React from 'react';
 import {IHero, IPrice} from "../../../models";
-import styles from "../../../styles/pages/home.module.scss";
+import styles from "./styles.module.scss";
 import {Button, Card, Col, Image, Row, Typography} from "antd";
 import calculatorHero from "../../../assets/utils/calculator";
 import heroConstant from "../../../assets/constants/hero";
@@ -43,7 +43,7 @@ const HeroItem: React.FC<HeroItemProps> = (props)=>{
 
   const rarityComponent = React.useMemo(()=>{
     return (
-      <Title level={3} style={{marginTop: 0, marginLeft: 20}}
+      <Title level={4} style={{marginTop: 0, marginLeft: 20}}
              className={heroConstant.RarityColor[hero.heroRarity]}>
         {heroConstant.RarityName[hero.heroRarity]}
       </Title>
@@ -56,7 +56,7 @@ const HeroItem: React.FC<HeroItemProps> = (props)=>{
       hoverable
       cover={(
         <Row >
-          <Col span={6}>
+          <Col span={8}>
             <Image
               alt={hero['name']}
               height={200}
@@ -66,19 +66,19 @@ const HeroItem: React.FC<HeroItemProps> = (props)=>{
               src={process.env.assetsDomain+hero['imageAvatar']} />
           </Col>
 
-          <Col span={18} style={{display: 'flex', width: '100%',
+          <Col span={16} style={{display: 'flex', width: '100%',
             padding: '20px 0',
             flexDirection: 'column', alignItems:'center'}}>
             <div style={{display: 'flex'}}>
-              <Title level={3} >
+              <Title level={5} >
                 {hero['name']}
               </Title>
               {rarityComponent}
             </div>
-            <Title level={3} className={'color-orange'}>
+            <Title level={4} className={'color-orange'}>
               {calculatorHero.price(hero).toFixed(2)} WBNB
             </Title>
-            <Title level={3} style={{marginTop: 0, color: '#09d509'}}>
+            <Title level={4} style={{marginTop: 0, color: '#09d509'}}>
               {calculateHeroPrice().toFixed(2)} USD
             </Title>
           </Col>
@@ -112,7 +112,7 @@ const HeroItem: React.FC<HeroItemProps> = (props)=>{
           </Row>
           <Title level={4}>Remaining days:
             <span className={'color-text'}>&nbsp;
-              {calculatorHero.totalBattleDay(hero)} days
+              {Math.ceil(calculatorHero.totalBattleDay(hero))} days
             </span>
           </Title>
           <Title level={4} style={{marginTop: 0}}>Win rate & resources:
