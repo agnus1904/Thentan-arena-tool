@@ -2,38 +2,37 @@ import type {NextPage} from 'next'
 import React from "react";
 import styles from '../styles/pages/home.module.scss'
 import heroApi from '../api-client/heroApi';
-import {Button, Col, Row, Typography, Checkbox, Image, Radio, RadioChangeEvent} from 'antd';
+import {Col, Pagination, Row, Typography} from 'antd';
 import HeroItem from "../components/common/HeroItem";
 import coinApi from "../api-client/coinApi";
-import Head from 'next/head'
+import Head from 'next/head';
 import {IHero, IHeroFilter, IPrice} from "../models";
 import calculatorHero from "../assets/utils/calculator";
-import { Pagination } from 'antd';
 import {CheckboxValueType} from "antd/es/checkbox/Group";
-import axios from "axios";
-import priceConstant from "../assets/constants/price";
+import Filter from "../components/pages/Home/Filter/Filter";
+import Price from "../components/pages/Home/Price/Price";
 
-const {Title} = Typography;
 
 const Home: NextPage = () => {
   const [heroes, setHeroes] = React.useState<IHero[]>([])
   const [heroesFilter, setHeroesFilter] = React.useState<IHero[]>([]);
   const [price, setPrice] =
     React.useState<null | IPrice>(null)
-  const [filter] = React.useState<IHeroFilter>({
+  const [filter, setFilter] = React.useState<IHeroFilter>({
     sort: 'Latest',
     batPercentMin: 0,
-    heroRarity: [0,1,2],
+    heroRarity: [0, 1, 2],
     from: 0,
     size: 100
   })
+  const [isFetching, setIsFetching] = React.useState(false);
 
   const [filterLocal, setFilterLocal] = React.useState<{
-    heroRarity: CheckboxValueType[],
-    profitLowerPercent: number
+    profitLowerPercent: number,
+    battleDaysRemaining: number
   }>({
-    heroRarity: [0,1,2],
-    profitLowerPercent: 70
+    profitLowerPercent: 50,
+    battleDaysRemaining: 50
   })
 
   const [pagination, setPagination] = React.useState({
@@ -43,6 +42,7 @@ const Home: NextPage = () => {
 
   //fetch Heroes
   const recallHeroes = React.useCallback(async () => {
+    setIsFetching(true);
     const response = await heroApi.getAll(filter);
     if (response.error || !response.data) return;
     setHeroes(response.data);
@@ -50,9 +50,6 @@ const Home: NextPage = () => {
 
   //fetch price
   const getPrice = React.useCallback(async () => {
-    setHeroesFilter([]);
-    const response = await axios.get('/api/auto-request');
-    console.log(response.data);
     const newPrice = await coinApi.getPrice();
     if (newPrice.error || !newPrice.data) {
       setPrice(null);
@@ -67,18 +64,17 @@ const Home: NextPage = () => {
 
   //filter heroes after get heroes
   //filter again after filterLocal change
-  React.useEffect(()=>{
-    if(heroes.length > 0){
-      const filterHeroes = heroes.filter((_hero)=>{
-        const isInRarities = filterLocal.heroRarity.includes(_hero.heroRarity);
-        const profit =
-          (calculatorHero.THCReward(_hero, filterLocal.profitLowerPercent)* (price?.THC||0))
-          - (calculatorHero.price(_hero)*(price?.WBNB||0));
-        return (isInRarities && (profit>0));
+  React.useEffect(() => {
+    if (heroes.length > 0) {
+      const filterHeroes = heroes.filter((_hero) => {
+        const profit = calculatorHero.profit(_hero, filterLocal, price);
+        const battleDays = calculatorHero.totalBattleDay(_hero);
+        return profit > 0 && battleDays < filterLocal.battleDaysRemaining;
       })
       setHeroesFilter(filterHeroes);
+      setIsFetching(false);
     }
-  },[filterLocal.heroRarity, filterLocal.profitLowerPercent, heroes, price?.THC, price?.WBNB])
+  }, [filterLocal, filterLocal.profitLowerPercent, heroes, price])
 
   //get heroes after change price
   React.useEffect(() => {
@@ -87,49 +83,77 @@ const Home: NextPage = () => {
 
   // getPrice after load
   React.useEffect(() => {
+    setIsFetching(true)
     getPrice();
   }, [getPrice])
 
-
   const paginationFilter = React.useCallback((index: number): boolean => {
     return (
-      index >= pagination.pageIndex*pagination.pageSize &&
-      index <= pagination.pageIndex*pagination.pageSize+5
+      index >= pagination.pageIndex * pagination.pageSize &&
+      index <= pagination.pageIndex * pagination.pageSize + 5
     )
-  },[pagination.pageIndex, pagination.pageSize])
+  }, [pagination.pageIndex, pagination.pageSize])
 
-  const onPaginationChange = (pageNumber: number) =>{
+  const onPaginationChange = (pageNumber: number) => {
     setPagination({
       ...pagination,
-      pageIndex: pageNumber-1
+      pageIndex: pageNumber - 1
     })
   }
 
-  const handleRarityChange = (checkedValues:  CheckboxValueType[])=>{
-    setFilterLocal(rev=> ({
+  const handleRarityChange = (checkedValues: CheckboxValueType[]) => {
+    const values: number[] = checkedValues.map(
+      value=>JSON.parse(JSON.stringify(value))
+    );
+    setFilter(rev => ({
       ...rev,
-      heroRarity: checkedValues,
+      heroRarity: values,
     }))
   }
 
-  const handleProfitChange = (e:  RadioChangeEvent)=>{
-    setFilterLocal(rev=>({
-      ...rev,
-      profitLowerPercent: e.target.value
-    }))
+  const filterRef = React.useRef<any>(null);
+
+  const handleProfitChange = (value: number) => {
+    if (filterRef.current) {
+      clearTimeout(filterRef.current)
+    }
+    filterRef.current = setTimeout(() => {
+      setFilterLocal(rev => ({
+        ...rev,
+        profitLowerPercent: value
+      }))
+    }, 2000)
+  }
+
+  const handleBattleDaysChange = (value: number) => {
+    if (filterRef.current) {
+      clearTimeout(filterRef.current)
+    }
+    filterRef.current = setTimeout(() => {
+      setFilterLocal(rev => ({
+        ...rev,
+        battleDaysRemaining: value
+      }))
+    }, 2000)
   }
 
   const heroListComponent = React.useMemo(() => (
     price && heroesFilter.map((_hero, index) =>
       paginationFilter(index) ?
-      (<Col key={_hero.refId} lg={8} md={12} sm={24}
-           style={{display: 'flex', justifyContent: 'center',
-             width: '100%',padding: 20}}>
-        <HeroItem hero={_hero} price={price}/>
-      </Col>) : <React.Fragment key={_hero.refId} />
+        (<Col key={_hero.refId} lg={8} md={12} sm={24}
+              style={{
+                display: 'flex', justifyContent: 'center',
+                width: '100%', padding: 20
+              }}>
+          <HeroItem hero={_hero} price={price}/>
+        </Col>)
+        : <React.Fragment key={_hero.refId}/>
     )
   ), [heroesFilter, paginationFilter, price])
 
+  console.log('fetching', isFetching);
+  console.log('data', heroes.length);
+  console.log('dataFilter', heroesFilter.length);
   return (
     <>
       <Head>
@@ -138,70 +162,29 @@ const Home: NextPage = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
       </Head>
       <div className={styles['home-container']}>
-        <div className={styles['filter-box']}>
-          <Row style={{width: '100%', maxWidth: 1400}}>
-            <Col md={1} sm={0} />
-            <Col md={3} sm={8} xs={8} className={styles['recall-box']}>
-              <Button type={'primary'} onClick={getPrice}>Recall</Button>
-            </Col>
-            <Col md={8} sm={16} xs={16} style={{display: 'flex',
-              flexDirection: 'column'}}>
-              <Title level={4}>Hero rarity</Title>
-              <Checkbox.Group
-                options={[
-                  { label: 'Common', value: 0 },
-                  { label: 'Epic', value: 1 },
-                  { label: 'Legendary', value: 2 }]}
-                defaultValue={[0,1]}
-                onChange={handleRarityChange} />
-            </Col>
-            <Col md={0} sm={2} xs={1}/>
-            <Col md={12} sm={20} xs={22}
-                 style={{
-                   marginTop: 10, display: 'flex',
-                   flexDirection: 'column'}}>
-              <Title level={4}>Positive profit at</Title>
-              <Radio.Group onChange={handleProfitChange}
-                           value={filterLocal.profitLowerPercent}>
-                <Radio value={30}>30%</Radio>
-                <Radio value={40}>40%</Radio>
-                <Radio value={50}>50%</Radio>
-                <Radio value={60}>60%</Radio>
-                <Radio value={70}>70%</Radio>
-                <Radio value={80}>80%</Radio>
-              </Radio.Group>
-            </Col>
-          </Row>
-        </div>
+
+        <Filter
+          getPrice={getPrice} filter={filter}
+          filterLocal={filterLocal}
+          handleRarityChange={handleRarityChange}
+          handleProfitChange={handleProfitChange}
+          handleBattleDaysChange={handleBattleDaysChange}
+        />
+
+        {/*price*/}
         <Row>
-          <Col span={6}/>
-          <Col span={12} className={styles['price-box']} >
-            <Row style={{width: '100%'}}>
-              <Col span={8} className={styles['price-item']}>
-                <Image
-                  src={priceConstant.image.THC}
-                  alt={'THC Image'} width={20} preview={false}
-                />&nbsp;&nbsp;{price?.THC}&nbsp;<span style={{color: '#09d509'}}>$</span>
-              </Col>
-              <Col span={8} className={styles['price-item']}>
-                <Image
-                  src={priceConstant.image.THG}
-                  alt={'THG Image'} width={20} preview={false}
-                />&nbsp;&nbsp;{price?.THG}&nbsp;<span style={{color: '#09d509'}}>$</span>
-              </Col>
-              <Col span={8} className={styles['price-item']}>
-                <Image
-                  src={priceConstant.image.WBNB}
-                  alt={'WBNB Image'} width={20} preview={false}
-                />&nbsp;&nbsp;{price?.WBNB}&nbsp;<span style={{color: '#09d509'}}>$</span>
-              </Col>
-            </Row>
+          <Col md={6} sm={4} xs={3}/>
+          <Col md={12} sm={16} xs={18} className={styles['price-box']}>
+            <Price price={price}/>
           </Col>
         </Row>
+
+        {/*paging*/}
         <Row>
           <Col span={24} className={styles['pagination-box']}>
-            {heroesFilter.length>0? (
+            {heroesFilter.length > 0 ? (
               <Pagination
+                current={pagination.pageIndex + 1}
                 pageSize={6}
                 defaultCurrent={1}
                 onChange={onPaginationChange}
@@ -215,17 +198,41 @@ const Home: NextPage = () => {
               />)}
           </Col>
         </Row>
-        {heroesFilter.length === 0 && (
-          <Row className={styles.loading}>
-            <Title>...Loading</Title>
-          </Row>
-        )}
+        {
+          isFetching ? (
+            <Row className={styles.loading}>
+              <Typography.Title>...Loading</Typography.Title>
+            </Row>
+          ) : (heroesFilter.length === 0) && (
+            <Row className={styles.loading}>
+              <Typography.Title>No data</Typography.Title>
+            </Row>
+          )
+        }
         <div className={styles['hero-list']}>
           <Row style={{width: '100%', maxWidth: 1400}}>
-            {heroListComponent}
+            {isFetching || heroListComponent}
           </Row>
         </div>
-
+        {/*paging*/}
+        <Row>
+          <Col span={24} className={styles['pagination-box']}>
+            {heroesFilter.length > 0 ? (
+              <Pagination
+                current={pagination.pageIndex + 1}
+                pageSize={6}
+                defaultCurrent={1}
+                onChange={onPaginationChange}
+                total={heroesFilter.length}
+              />) : (
+              <Pagination
+                pageSize={6}
+                defaultCurrent={1}
+                onChange={onPaginationChange}
+                total={6}
+              />)}
+          </Col>
+        </Row>
       </div>
     </>
   )

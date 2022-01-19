@@ -37,7 +37,6 @@ export default async function handler(
     const WBNBPrice: number = response.data[2]['current_price'];
     const THCPrice: number = response.data[1]['current_price'];
     const THGPrice: number = response.data[0]['current_price']
-    console.log(response.data[0]);
     const price = {
       WBNB: WBNBPrice,
       THC: THCPrice,

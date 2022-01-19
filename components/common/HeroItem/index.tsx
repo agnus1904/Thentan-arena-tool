@@ -25,7 +25,7 @@ const HeroItem: React.FC<HeroItemProps> = (props)=>{
 
   const calculateTotalUSD = React.useCallback((_percent: number)=>{
     const totalUSD = calculatorHero.THCReward(hero, _percent)*price.THC;
-    return totalUSD-calculateHeroPrice();
+    return totalUSD*0.96-calculateHeroPrice();
   },[calculateHeroPrice, hero, price.THC])
 
   const percentRewardComponent = React.useMemo(()=>{
@@ -76,7 +76,7 @@ const HeroItem: React.FC<HeroItemProps> = (props)=>{
               {rarityComponent}
             </div>
             <Title level={4} className={'color-orange'}>
-              {calculatorHero.price(hero).toFixed(2)} WBNB
+              {calculatorHero.price(hero).toFixed(3)} WBNB
             </Title>
             <Title level={4} style={{marginTop: 0, color: '#09d509'}}>
               {calculateHeroPrice().toFixed(2)} USD
@@ -105,7 +105,7 @@ const HeroItem: React.FC<HeroItemProps> = (props)=>{
               <a target="_blank" rel="noreferrer"
                  href={process.env.marketplaceDomain + 'item/' + hero['refId']}>
                 <Button type={'primary'} size={'large'}>
-                  Buy Now
+                  Go to store
                 </Button>
               </a>
             </Col>
@@ -115,7 +115,8 @@ const HeroItem: React.FC<HeroItemProps> = (props)=>{
               {Math.ceil(calculatorHero.totalBattleDay(hero))} days
             </span>
           </Title>
-          <Title level={4} style={{marginTop: 0}}>Win rate & resources:
+          <Title level={4} style={{marginTop: 0}}>
+            Win rate & profit:
             <span className={'color-text'}> $</span></Title>
           <Row className={styles['table']}>
             {percentRewardComponent}

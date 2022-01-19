@@ -1,0 +1,43 @@
+.filter-box{
+  margin: 20px 40px;
+  padding: 20px 0;
+  display: flex;
+  justify-content: center;
+  background: #362478;
+  border-radius: 10px;
+  .recall-box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    //padding: 30px 0;
+  }
+  .profit-box{
+    width: 100%;
+    margin-top: 15px;
+    //padding: 0 50px 0 0;
+    div[class='ant-slider ant-slider-with-marks']{
+      div[class='ant-slider-rail'],
+      div[class='ant-slider-track']{
+        background-color: #6e41f9;
+      }
+      div[class='ant-slider-step']{
+        span[class='ant-slider-dot']{
+          background-color: #fff;
+        }
+        span[class='ant-slider-dot ant-slider-dot-active']{
+          background-color: #fff;
+        }
+      }
+      div[class='ant-slider-handle ant-tooltip-open']{
+        width: 16px;
+        height: 16px;
+        margin-top: -6px;
+        background-color: #ffffff;
+      }
+    }
+  }
+  .filter{
+    display: flex;
+    align-items: center;
+  }
+}

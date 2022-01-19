@@ -1,8 +1,18 @@
 import heroConstant from "../constants/hero";
-import {IHero} from "../../models";
+import {IHero, IPrice} from "../../models";
 
+interface IFilterLocal {
+  profitLowerPercent: number,
+  battleDaysRemaining: number
+}
 
 const calculatorHero = {
+  profit: (hero: IHero, filterLocal: IFilterLocal, price: IPrice | null)=>{
+    if(price===null) return 0;
+    const total = calculatorHero.THCReward(hero, filterLocal.profitLowerPercent) * (price?.THC || 0);
+    const heroPrice = calculatorHero.price(hero) * (price?.WBNB || 0);
+    return total*0.96 - heroPrice;
+  },
   price: (hero: IHero)=>{
     return hero.systemCurrency.value/(Math.pow(10,hero.systemCurrency.decimals));
   },
