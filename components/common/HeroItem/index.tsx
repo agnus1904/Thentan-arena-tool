@@ -60,6 +60,8 @@ const HeroItem: React.FC<HeroItemProps> = (props)=>{
           <div className={styles['tool-tip']}>
             <Image alt={'text'} width={40} height={40}
               src={heroConstant.trophyClass[hero.trophyClass]}/>
+            <Image alt={'text'} width={30} height={30}
+                   src={heroConstant.level[hero.level]}/>
           </div>
           <Col span={8} className={styles['avatar-box']}>
 

@@ -37,12 +37,16 @@ const marksBattle = {
 
 
 interface FilterProps {
-  getPrice: () => void;
+  onRecall: () => void;
   isFetching: boolean;
-  filter: IHeroFilter;
-  filterLocal: {
+  networkFilter: IHeroFilter;
+  localFilter: {
     profitLowerPercent: number,
-    battleDaysRemaining: number
+    battleDaysRemaining: number,
+    pagination: {
+      pageIndex: number,
+      pageSize: number
+    }
   };
   handleBattleDaysChange: (value: number) => void;
   handleRarityChange: (checkedValues: CheckboxValueType[]) => void;
@@ -51,10 +55,10 @@ interface FilterProps {
 
 const Filter: React.FC<FilterProps> = (props) => {
   const {
-    getPrice,
-    filter,
+    onRecall,
+    networkFilter,
+    localFilter,
     isFetching,
-    filterLocal,
     handleBattleDaysChange,
     handleRarityChange,
     handleProfitChange
@@ -66,8 +70,7 @@ const Filter: React.FC<FilterProps> = (props) => {
         <Col md={1} sm={0}/>
         <Col md={3} sm={8} xs={8} className={styles['recall-box']}>
           <Button disabled={isFetching}
-                  // style={isFetching ? {backgroundColor: 'gray'} : undefined}
-                  type={'primary'} onClick={getPrice}>
+                  type={'primary'} onClick={onRecall}>
             <ReloadOutlined/>
           </Button>
         </Col>
@@ -81,7 +84,7 @@ const Filter: React.FC<FilterProps> = (props) => {
               {label: 'Common', value: 0},
               {label: 'Epic', value: 1},
               {label: 'Legendary', value: 2}]}
-            defaultValue={filter.heroRarity}
+            defaultValue={networkFilter.heroRarity}
             onChange={handleRarityChange}/>
         </Col>
         <Col md={0} sm={2} xs={1}/>
@@ -95,7 +98,7 @@ const Filter: React.FC<FilterProps> = (props) => {
               <Title level={4}>Max battle days</Title>
             </Col>
             <Col sm={18} xs={24}>
-              <Slider defaultValue={filterLocal.battleDaysRemaining}
+              <Slider defaultValue={localFilter.battleDaysRemaining}
                       tooltipPlacement={'right'}
                       tooltipVisible
                       marks={marksBattle}
@@ -108,7 +111,7 @@ const Filter: React.FC<FilterProps> = (props) => {
               <Title level={4}>Positive profit</Title>
             </Col>
             <Col sm={18} xs={24}>
-              <Slider defaultValue={filterLocal.profitLowerPercent}
+              <Slider defaultValue={localFilter.profitLowerPercent}
                       tooltipPlacement={'right'}
                       tooltipVisible
                       marks={marksProfit}

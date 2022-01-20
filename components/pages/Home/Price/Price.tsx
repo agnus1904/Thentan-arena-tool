@@ -18,19 +18,19 @@ const Price: React.FC<PriceProps> = (props) => {
         <Image
           src={priceConstant.image.THC}
           alt={'THC Image'} width={20} preview={false}
-        />&nbsp;&nbsp;{price?.THC}&nbsp;<span style={{color: '#09d509'}}>$</span>
+        />&nbsp;&nbsp;{price?.THC || '---'}&nbsp;<span style={{color: '#09d509'}}>$</span>
       </Col>
       <Col span={8} className={styles['price-item']}>
         <Image
           src={priceConstant.image.THG}
           alt={'THG Image'} width={20} preview={false}
-        />&nbsp;&nbsp;{price?.THG}&nbsp;<span style={{color: '#09d509'}}>$</span>
+        />&nbsp;&nbsp;{price?.THG || '---'}&nbsp;<span style={{color: '#09d509'}}>$</span>
       </Col>
       <Col span={8} className={styles['price-item']}>
         <Image
           src={priceConstant.image.WBNB}
           alt={'WBNB Image'} width={20} preview={false}
-        />&nbsp;&nbsp;{price?.WBNB}&nbsp;<span style={{color: '#09d509'}}>$</span>
+        />&nbsp;&nbsp;{price?.WBNB || '---'}&nbsp;<span style={{color: '#09d509'}}>$</span>
       </Col>
     </Row>
   );
