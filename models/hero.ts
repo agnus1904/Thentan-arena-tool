@@ -30,7 +30,7 @@ export interface IHero{
       decimals: number
   };
   tokenId: string;
-  trophyClass: any;
+  trophyClass: number;
 }
 
 export interface IHeroFilter{

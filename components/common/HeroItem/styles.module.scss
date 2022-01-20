@@ -3,6 +3,14 @@
   width: 390px;
   background: #362478;
   border-radius: 10px;
+  position: relative;
+  .tool-tip{
+    position: absolute;
+    z-index: 10;
+    top: -20px;
+    left: -20px;
+    padding: 5px 10px;
+  }
   div[class='ant-card-body']{
     padding: 0 10px 24px 10px;
   }

@@ -4,6 +4,7 @@ import styles from "./styles.module.scss";
 import {Button, Card, Col, Image, Row, Typography} from "antd";
 import calculatorHero from "../../../assets/utils/calculator";
 import heroConstant from "../../../assets/constants/hero";
+import {ShoppingCartOutlined} from "@ant-design/icons";
 
 const { Meta } = Card;
 const { Title, Text } = Typography;
@@ -56,7 +57,12 @@ const HeroItem: React.FC<HeroItemProps> = (props)=>{
       hoverable
       cover={(
         <Row >
-          <Col span={8}>
+          <div className={styles['tool-tip']}>
+            <Image alt={'text'} width={40} height={40}
+              src={heroConstant.trophyClass[hero.trophyClass]}/>
+          </div>
+          <Col span={8} className={styles['avatar-box']}>
+
             <Image
               alt={hero['name']}
               height={200}
@@ -89,7 +95,7 @@ const HeroItem: React.FC<HeroItemProps> = (props)=>{
         (<Title level={4} className={'color-text'}>{hero['refId']}</Title>)} description={(
         <>
           <Row>
-            <Col span={16}>
+            <Col span={18}>
               <Title level={4} >
                 <Row >
                   <Col span={16}>Available</Col>
@@ -101,11 +107,18 @@ const HeroItem: React.FC<HeroItemProps> = (props)=>{
                 </Row>
               </Title>
             </Col>
-            <Col span={8}>
+            <Col span={6}>
               <a target="_blank" rel="noreferrer"
                  href={process.env.marketplaceDomain + 'item/' + hero['refId']}>
-                <Button type={'primary'} size={'large'}>
-                  Go to store
+                <Button type={'primary'}
+                        style={{
+                          paddingTop: 10,
+                          width: '100%',
+                          height: '100%',
+                          borderRadius: 5,
+                        }}
+                        size={'large'}>
+                  <ShoppingCartOutlined style={{fontSize: 35}}/>
                 </Button>
               </a>
             </Col>

@@ -42,11 +42,12 @@ const Home: NextPage = () => {
 
   //fetch Heroes
   const recallHeroes = React.useCallback(async () => {
+    if(isFetching) return;
     setIsFetching(true);
     const response = await heroApi.getAll(filter);
     if (response.error || !response.data) return;
     setHeroes(response.data);
-  }, [filter])
+  }, [filter, isFetching])
 
   //fetch price
   const getPrice = React.useCallback(async () => {
@@ -166,6 +167,7 @@ const Home: NextPage = () => {
         <Filter
           getPrice={getPrice} filter={filter}
           filterLocal={filterLocal}
+          isFetching={isFetching}
           handleRarityChange={handleRarityChange}
           handleProfitChange={handleProfitChange}
           handleBattleDaysChange={handleBattleDaysChange}

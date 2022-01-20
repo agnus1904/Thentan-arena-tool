@@ -38,6 +38,7 @@ const marksBattle = {
 
 interface FilterProps {
   getPrice: () => void;
+  isFetching: boolean;
   filter: IHeroFilter;
   filterLocal: {
     profitLowerPercent: number,
@@ -52,6 +53,7 @@ const Filter: React.FC<FilterProps> = (props) => {
   const {
     getPrice,
     filter,
+    isFetching,
     filterLocal,
     handleBattleDaysChange,
     handleRarityChange,
@@ -63,7 +65,9 @@ const Filter: React.FC<FilterProps> = (props) => {
       <Row style={{width: '100%', maxWidth: 1400, paddingRight: 40,}}>
         <Col md={1} sm={0}/>
         <Col md={3} sm={8} xs={8} className={styles['recall-box']}>
-          <Button type={'primary'} onClick={getPrice}>
+          <Button disabled={isFetching}
+                  // style={isFetching ? {backgroundColor: 'gray'} : undefined}
+                  type={'primary'} onClick={getPrice}>
             <ReloadOutlined/>
           </Button>
         </Col>
